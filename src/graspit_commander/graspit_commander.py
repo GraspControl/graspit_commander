@@ -253,11 +253,11 @@ class GraspitCommander(object):
             raise InvalidRobotIDException(id)
 
     @staticmethod
-    def setRobotDesiredDOF(dofs, id=0):
+    def setRobotDesiredDOF(dofs, dof_velocities, id=0):
         _wait_for_service('setRobotDesiredDOF')
 
         serviceProxy = rospy.ServiceProxy('setRobotDesiredDOF', SetRobotDesiredDOF)
-        result = serviceProxy(id, dofs)
+        result = serviceProxy(id, dofs, dof_velocities)
 
         if result.result is SetRobotDesiredDOF._response_class.RESULT_SUCCESS:
             return
