@@ -27,6 +27,7 @@ from graspit_interface.srv import (
     SetBodyPose,
     GetDynamics,
     SetDynamics,
+    StepDynamics,
     AutoGrasp,
     AutoOpen,
     SetRobotDesiredDOF,
@@ -217,6 +218,15 @@ class GraspitCommander(object):
 
         serviceProxy = rospy.ServiceProxy('setDynamics', SetDynamics)
         serviceProxy(enabled)
+
+
+    @staticmethod
+    def stepDynamics(numSteps=1):
+        _wait_for_service('stepDynamics')
+
+        serviceProxy = rospy.ServiceProxy('stepDynamics', StepDynamics)
+        serviceProxy(numSteps)
+
 
     @staticmethod
     def autoGrasp(id=0):
