@@ -36,7 +36,6 @@ from graspit_interface.srv import (
     ApproachToContact,
     ComputeQuality,
     DynamicAutoGraspComplete,
-    ImportObstacle,
     FindInitialContact,
     ImportGraspableBody, 
     ImportObstacle,
@@ -45,7 +44,8 @@ from graspit_interface.srv import (
     SaveWorld,
     ToggleAllCollisions,
     SetRobotDOFForces,
-    ForceRobotDOF
+    ForceRobotDOF,
+    ToggleDynamicsController
 )
 
 from graspit_exceptions import (
@@ -274,11 +274,11 @@ class GraspitCommander(object):
             raise InvalidDynamicsModeException()
 
     @staticmethod
-    def setRobotDOFForces(dofs, dof_velocities, id=0):
+    def setRobotDOFForces(dofs, id=0):
         _wait_for_service('setRobotDOFForces')
 
         serviceProxy = rospy.ServiceProxy('setRobotDOFForces', SetRobotDOFForces)
-        result = serviceProxy(id, dofs, dof_velocities)
+        result = serviceProxy(id, dofs)
 
         if result.result is SetRobotDOFForces._response_class.RESULT_SUCCESS:
             return
@@ -472,3 +472,10 @@ class GraspitCommander(object):
 
         serviceProxy = rospy.ServiceProxy('toggleAllCollisions', ToggleAllCollisions)
         serviceProxy(enableCollisions)
+
+    @staticmethod
+    def toggleDynamicsController(enable):
+        _wait_for_service('toggleDynamicsController')
+
+        serviceProxy = rospy.ServiceProxy('toggleDynamicsController', ToggleDynamicsController)
+        serviceProxy(enable)
