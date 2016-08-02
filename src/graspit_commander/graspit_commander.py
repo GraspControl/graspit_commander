@@ -43,7 +43,9 @@ from graspit_interface.srv import (
     ImportRobot,
     SaveImage,
     SaveWorld,
-    ToggleAllCollisions
+    ToggleAllCollisions,
+    SetRobotDOFForces,
+    ForceRobotDOF
 )
 
 from graspit_exceptions import (
@@ -68,6 +70,7 @@ from graspit_exceptions import (
     ImportGraspableBodyException,
     SaveImageException,
     SaveWorldException,
+    InvalidDynamicsModeException
 )
 
 
@@ -251,6 +254,40 @@ class GraspitCommander(object):
             return
         elif result.result is AutoOpen._response_class.RESULT_INVALID_ID:
             raise InvalidRobotIDException(id)
+
+    @staticmethod
+    def forceRobotDof(dofs, id=0):
+        _wait_for_service('forceRobotDof')
+
+        serviceProxy = rospy.ServiceProxy('forceRobotDof', ForceRobotDOF)
+        result = serviceProxy(id, dofs)
+
+        if result.result is ForceRobotDOF._response_class.RESULT_SUCCESS:
+            return
+        elif result.result is ForceRobotDOF._response_class.RESULT_INVALID_ID:
+            raise InvalidRobotIDException(id)
+        elif result.result is ForceRobotDOF._response_class.RESULT_DOF_OUT_OF_RANGE:
+            raise InvalidRobotDOFOutOfRangeException()
+        elif result.result is ForceRobotDOF._response_class.RESULT_DOF_COUNT_MISMATCH:
+            raise InvalidRobotDOFCountMismatchException()
+        elif result.result is ForceRobotDOF._response_class.RESULT_DYNAMICS_MODE_ENABLED:
+            raise InvalidDynamicsModeException()
+
+    @staticmethod
+    def setRobotDOFForces(dofs, dof_velocities, id=0):
+        _wait_for_service('setRobotDOFForces')
+
+        serviceProxy = rospy.ServiceProxy('setRobotDOFForces', SetRobotDOFForces)
+        result = serviceProxy(id, dofs, dof_velocities)
+
+        if result.result is SetRobotDOFForces._response_class.RESULT_SUCCESS:
+            return
+        elif result.result is SetRobotDOFForces._response_class.RESULT_INVALID_ID:
+            raise InvalidRobotIDException(id)
+        elif result.result is SetRobotDOFForces._response_class.RESULT_DOF_OUT_OF_RANGE:
+            raise InvalidRobotDOFOutOfRangeException()
+        elif result.result is SetRobotDOFForces._response_class.RESULT_DOF_COUNT_MISMATCH:
+            raise InvalidRobotDOFCountMismatchException()
 
     @staticmethod
     def setRobotDesiredDOF(dofs, dof_velocities, id=0):
